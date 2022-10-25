@@ -1,5 +1,5 @@
 import { hashPassword } from '../../../lib/auth';
-import { client } from '../../../lib/db';
+import { connectToDatabase } from '../../../lib/db';
 
 const handler = async (req, res) => {
   if (req.method === 'POST') {
@@ -10,6 +10,8 @@ const handler = async (req, res) => {
       res.status(422).json({ message: 'Invalid Input' });
       return;
     }
+
+    const client = await connectToDatabase();
 
     const db = client.db();
 
