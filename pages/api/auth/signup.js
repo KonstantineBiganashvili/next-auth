@@ -17,7 +17,15 @@ const handler = async (req, res) => {
 
     const db = client.db();
 
-    const hashedPassword = hashPassword(password);
+    const existingUser = await db.collection('users').findOne({ email: email });
+
+    if (existingUser) {
+      res.status(422).json({ message: 'User With This Email Already Exists!' });
+      client.close();
+      return;
+    }
+
+    const hashedPassword = await hashPassword(password);
 
     const result = await db.collection('users').insertOne({
       email,
@@ -25,6 +33,7 @@ const handler = async (req, res) => {
     });
 
     res.status(201).json({ message: 'Created User!' });
+    client.close();
   }
 };
 
