@@ -1,5 +1,5 @@
 import { hashPassword } from '../../../lib/auth';
-import { connectToDatabase } from '../../../lib/db';
+import { client } from '../../../lib/db';
 
 const handler = async (req, res) => {
   if (req.method === 'POST') {
@@ -11,17 +11,12 @@ const handler = async (req, res) => {
       return;
     }
 
-    const client = await connectToDatabase();
-
-    console.log('CLIENT', client);
-
     const db = client.db();
 
     const existingUser = await db.collection('users').findOne({ email: email });
 
     if (existingUser) {
       res.status(422).json({ message: 'User With This Email Already Exists!' });
-      client.close();
       return;
     }
 
@@ -33,7 +28,6 @@ const handler = async (req, res) => {
     });
 
     res.status(201).json({ message: 'Created User!' });
-    client.close();
   }
 };
 
